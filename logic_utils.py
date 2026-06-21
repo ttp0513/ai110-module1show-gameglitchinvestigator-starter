@@ -26,11 +26,13 @@ def parse_guess(raw: str, low: int, high: int):
     if raw == "":
         return False, None, "Enter a guess."
 
+    # CHANGED: only whole numbers are allowed. Decimal input like "12.9" is
+    # rejected instead of being silently floored to an int.
+    if "." in raw:
+        return False, None, "Enter a whole number (no decimals)."
+
     try:
-        if "." in raw:
-            value = int(float(raw))
-        else:
-            value = int(raw)
+        value = int(raw)
     except Exception:
         return False, None, "That is not a number."
 

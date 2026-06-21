@@ -62,3 +62,4 @@ Describe your fixed game in numbered steps so a reader can follow along without 
 ## 🚀 Stretch Features
 
 - [x] **Guess History.** Added a "📜 Guess History" panel that lists every guess made in the current game (most recent first), showing the attempt number, the guessed value, the outcome (Win / Too High / Too Low / Invalid), and the hint message. Each guess is stored as a structured entry, and starting a new game clears the history, score, and status for a clean slate.
+- [x] **Whole-number validation.** `parse_guess` now rejects decimal input (e.g. `12.9`) with the message "Enter a whole number (no decimals)." instead of silently flooring it, so only valid integer guesses are accepted.
