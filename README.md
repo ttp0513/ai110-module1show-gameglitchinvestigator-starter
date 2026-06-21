@@ -61,4 +61,4 @@ Describe your fixed game in numbered steps so a reader can follow along without 
 
 ## 🚀 Stretch Features
 
-- [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
+- [x] **Guess History.** Added a "📜 Guess History" panel that lists every guess made in the current game (most recent first), showing the attempt number, the guessed value, the outcome (Win / Too High / Too Low / Invalid), and the hint message. Each guess is stored as a structured entry, and starting a new game clears the history, score, and status for a clean slate.
