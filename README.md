@@ -56,7 +56,17 @@ Describe your fixed game in numbered steps so a reader can follow along without 
 ```
 # Paste your pytest output here, e.g.:
 # pytest tests/
-# ========================= X passed in 0.XXs =========================
+# PS C:\Users\JohnP\Documents\GitHub\CodePath\ai110-module1show-gameglitchinvestigator-starter-main> python -m pytest tests/
+============================================================================== test session starts ==============================================================================
+platform win32 -- Python 3.13.5, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Users\JohnP\Documents\GitHub\CodePath\ai110-module1show-gameglitchinvestigator-starter-main
+plugins: anyio-4.10.0
+collected 20 items                                                                                                                                                               
+
+tests\test_game_logic.py ....................                                                                                                                              [100%]
+
+============================================================================== 20 passed in 0.03s ===============================================================================
+PS C:\Users\JohnP\Documents\GitHub\CodePath\ai110-module1show-gameglitchinvestigator-starter-main> 
 ```
 
 ## 🚀 Stretch Features
