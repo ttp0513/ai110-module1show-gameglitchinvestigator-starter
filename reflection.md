@@ -35,8 +35,11 @@ Document at least 3 bugs you found. Add rows as needed.
   - Claude
 
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
+  - The AI diagnosed why hints were unreliable: on even-numbered attempts the code converted the secret to a string (secret = str(st.session_state.secret)) before calling check_guess, forcing an int vs str comparison. In Python that fell back to lexicographic string comparison (e.g. "9" > "50" is True), so the hints were wrong on those turns. The AI suggested coercing both values to int inside check_guess and removing the str(secret) glitch so the secret is always passed as an integer. I verified this by confirming the existing pytest cases (test_guess_too_high, test_guess_too_low, test_winning_guess) still passed after the change.
 
+
+- Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
+  - When fixing the wrong hints, the AI first suggested that coercing guess and secret to int in check_guess would "make the hints correct on every attempt." That was misleading — it fixed the int/string comparison glitch, but the hints were still wrong because of a separate swapped-message bug. I verified by testing again: guessing 1 still showed "Go LOWER" even after that change. Only after also swapping the hint text did the hints actually become correct. This showed one fix didn't fully solve the reported problem, despite the AI's claim.
 ---
 
 ## 3. Debugging and testing your fixes
