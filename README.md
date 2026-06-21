@@ -25,9 +25,14 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+- [x] **Describe the game's purpose.**
+-  A Streamlit number-guessing game where the player tries to guess a secret number within a limited number of attempts, with "higher/lower" hints and a score.
+
+- [x] **Detail which bugs you found.**
+1. Out-of-range guesses such as `-1` or `0` were accepted as valid and returned a misleading "Go LOWER" hint, even though the secret number is only ever within the difficulty's range such as 1 to 50.
+
+- [x] **Explain what fixes you applied.**
+1. Added an `is_in_range(value, low, high)` helper and updated `parse_guess` to call it, rejecting any guess outside the inclusive `[low, high]` range with the message "Enter a number between {low} and {high}." This stops invalid guesses from reaching `check_guess` and producing false hints.
 
 ## 📸 Demo Walkthrough
 
