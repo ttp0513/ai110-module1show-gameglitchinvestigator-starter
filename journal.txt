@@ -1,9 +1,0 @@
-Issues & Bugs
-1. Input 1 returns go lower when the minimum is 1 and 100
-2. Input 42 returns go lower when the answer is 54
-3. Input -1 or 0 returns go lower
-4. Input 99 returns go higher but 100 returns go lower
-5. New Game doesn't reset the game
-6. Logic in the difficulty doesnt seem right
-
- 
