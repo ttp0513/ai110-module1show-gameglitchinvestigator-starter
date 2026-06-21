@@ -21,9 +21,10 @@ Document at least 3 bugs you found. Add rows as needed.
 
 | Input | Expected Behavior | Actual Behavior | Console Output / Error |
 |-------|-------------------|-----------------|------------------------|
-| -1 | Go Higher | Go Lower | |
-| 99 then 100 | if 100 is not correct, then both 99 and 100 should return go lower| 99 returns Go Higher, 100 returns Go Lower, secret number is not 100 | |
-| | | | |
+| -1 or 0 | Go Higher | Go Lower | Guess is below secret, but hint is inverted|
+| 99 then 100 | if 100 is not correct, then both 99 and 100 should return go lower| 99 returns Go Higher, 100 returns Go Lower, and the secret isn't 100 | TypeError caught internally. On even attempts the secret becomes a string, so guess is compared as text ("100" < "54") |
+| 42 (secret is 54) | Go Higher  | Go Lower | Guess is higher secret, but hint is inverted |
+| Click "New Game" after winning/losing | Game fully resets: new secret, score 0, attempts cleared, playable again | Secret and attempts reset but status, score, and history persist; game stays in won/lost state and won't play | None 
 
 ---
 
