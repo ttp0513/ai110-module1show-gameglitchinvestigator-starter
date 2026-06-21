@@ -41,22 +41,20 @@ def parse_guess(raw: str, low: int, high: int):
     return True, value, None
 
 
+# CHANGED: Always compare guess and secret as integers. The old version fell
+# back to string comparison on a type mismatch, which produced lexicographic
+# (e.g. "9" > "50") and therefore wrong "higher/lower" hints.
 def check_guess(guess, secret):
+    guess = int(guess)
+    secret = int(secret)
+
     if guess == secret:
         return "Win", "🎉 Correct!"
-
-    try:
-        if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
-        else:
-            return "Too Low", "📉 Go LOWER!"
-    except TypeError:
-        g = str(guess)
-        if g == secret:
-            return "Win", "🎉 Correct!"
-        if g > secret:
-            return "Too High", "📈 Go HIGHER!"
-        return "Too Low", "📉 Go LOWER!"
+    # CHANGED: swapped the hint text to match the outcome. A guess that is too
+    # high should tell the player to go LOWER, and too low should say go HIGHER.
+    if guess > secret:
+        return "Too High", "📉 Go LOWER!"
+    return "Too Low", "📈 Go HIGHER!"
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
@@ -88,12 +86,13 @@ difficulty = st.sidebar.selectbox(
     ["Easy", "Normal", "Hard"],
     index=1,
 )
-
+# CHANGED: Adjust attempts based on difficulty
 attempt_limit_map = {
-    "Easy": 6,
-    "Normal": 8,
-    "Hard": 5,
+    "Easy": 8,
+    "Normal": 7,
+    "Hard": 6,
 }
+
 attempt_limit = attempt_limit_map[difficulty]
 
 low, high = get_range_for_difficulty(difficulty)
@@ -168,10 +167,9 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
-        if st.session_state.attempts % 2 == 0:
-            secret = str(st.session_state.secret)
-        else:
-            secret = st.session_state.secret
+        # CHANGED: removed the even-attempt str(secret) glitch that forced an
+        # int/str mismatch in check_guess. The secret is now always passed as-is.
+        secret = st.session_state.secret
 
         outcome, message = check_guess(guess_int, secret)
 

@@ -30,9 +30,14 @@ It wrote the code, ran away, and now the game is unplayable.
 
 - [x] **Detail which bugs you found.**
 1. Out-of-range guesses such as `-1` or `0` were accepted as valid and returned a misleading "Go LOWER" hint, even though the secret number is only ever within the difficulty's range such as 1 to 50.
+2. On even-numbered attempts the secret was converted to a string before being compared, forcing an `int`/`str` mismatch in `check_guess` that fell back to lexicographic string comparison (e.g. `"9" > "50"`) and produced wrong hints.
+3. The hint text was swapped: a guess that was too high said "Go HIGHER!" and a guess that was too low said "Go LOWER!", so guessing `1` told the player to go lower.
 
 - [x] **Explain what fixes you applied.**
 1. Added an `is_in_range(value, low, high)` helper and updated `parse_guess` to call it, rejecting any guess outside the inclusive `[low, high]` range with the message "Enter a number between {low} and {high}." This stops invalid guesses from reaching `check_guess` and producing false hints.
+2. Hardened `check_guess` to always coerce `guess` and `secret` to `int` so comparisons are numeric, and removed the even-attempt `str(secret)` glitch so the secret is always passed as an integer.
+3. Swapped the hint text to match the outcome: too high now says "📉 Go LOWER!" and too low says "📈 Go HIGHER!".
+
 
 ## 📸 Demo Walkthrough
 
