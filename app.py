@@ -1,78 +1,14 @@
 import random
 import streamlit as st
 
-# FIXME: Difficulty Logic is off
-def get_range_for_difficulty(difficulty: str):
-    if difficulty == "Easy":
-        return 1, 20
-    if difficulty == "Normal":
-        return 1, 50
-    if difficulty == "Hard":
-        return 1, 100
-    return 1, 100
-
-
-# CHANGED: Added is_in_range() helper to enforce the valid guess range.
-def is_in_range(value: int, low: int, high: int):
-    """Return True only if value is within the inclusive [low, high] range."""
-    return low <= value <= high
-
-
-# CHANGED: parse_guess now takes low/high and rejects out-of-range numbers
-# (e.g. -1 or 0) so they no longer reach check_guess and report "Go LOWER".
-def parse_guess(raw: str, low: int, high: int):
-    if raw is None:
-        return False, None, "Enter a guess."
-
-    if raw == "":
-        return False, None, "Enter a guess."
-
-    try:
-        if "." in raw:
-            value = int(float(raw))
-        else:
-            value = int(raw)
-    except Exception:
-        return False, None, "That is not a number."
-
-    if not is_in_range(value, low, high):
-        return False, None, f"Enter a number between {low} and {high}."
-
-    return True, value, None
-
-
-# CHANGED: Always compare guess and secret as integers. The old version fell
-# back to string comparison on a type mismatch, which produced lexicographic
-# (e.g. "9" > "50") and therefore wrong "higher/lower" hints.
-def check_guess(guess, secret):
-    guess = int(guess)
-    secret = int(secret)
-
-    if guess == secret:
-        return "Win", "🎉 Correct!"
-    # CHANGED: swapped the hint text to match the outcome. A guess that is too
-    # high should tell the player to go LOWER, and too low should say go HIGHER.
-    if guess > secret:
-        return "Too High", "📉 Go LOWER!"
-    return "Too Low", "📈 Go HIGHER!"
-
-
-def update_score(current_score: int, outcome: str, attempt_number: int):
-    if outcome == "Win":
-        points = 100 - 10 * (attempt_number + 1)
-        if points < 10:
-            points = 10
-        return current_score + points
-
-    if outcome == "Too High":
-        if attempt_number % 2 == 0:
-            return current_score + 5
-        return current_score - 5
-
-    if outcome == "Too Low":
-        return current_score - 5
-
-    return current_score
+# CHANGED: game logic moved into logic_utils.py; app.py is now UI-only.
+from logic_utils import (
+    get_range_for_difficulty,
+    parse_guess,
+    check_guess,
+    get_hint_message,
+    update_score,
+)
 
 st.set_page_config(page_title="Glitchy Guesser", page_icon="🎮")
 
@@ -145,6 +81,10 @@ with col3:
 if new_game:
     st.session_state.attempts = 0
     st.session_state.secret = random.randint(1, 100)
+    # CHANGED: reset history, score and status so a new game starts clean.
+    st.session_state.history = []
+    st.session_state.score = 0
+    st.session_state.status = "playing"
     st.success("New game started.")
     st.rerun()
 
@@ -162,16 +102,36 @@ if submit:
     ok, guess_int, err = parse_guess(raw_guess, low, high)
 
     if not ok:
-        st.session_state.history.append(raw_guess)
+        # CHANGED: record invalid guesses as structured history entries too.
+        st.session_state.history.append(
+            {
+                "attempt": st.session_state.attempts,
+                "guess": raw_guess,
+                "outcome": "Invalid",
+                "message": err,
+            }
+        )
         st.error(err)
     else:
-        st.session_state.history.append(guess_int)
-
         # CHANGED: removed the even-attempt str(secret) glitch that forced an
         # int/str mismatch in check_guess. The secret is now always passed as-is.
         secret = st.session_state.secret
 
-        outcome, message = check_guess(guess_int, secret)
+        # CHANGED: check_guess now returns only the outcome; the hint text comes
+        # from get_hint_message so the logic stays UI-free in logic_utils.py.
+        outcome = check_guess(guess_int, secret)
+        message = get_hint_message(outcome)
+
+        # CHANGED: store each guess with its outcome and hint so the history
+        # feature can display what happened on every attempt.
+        st.session_state.history.append(
+            {
+                "attempt": st.session_state.attempts,
+                "guess": guess_int,
+                "outcome": outcome,
+                "message": message,
+            }
+        )
 
         if show_hint:
             st.warning(message)
@@ -197,6 +157,20 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+
+st.divider()
+
+# CHANGED: added a Guess History feature that lists every past guess this game,
+# most recent first, with its outcome and hint.
+st.subheader("📜 Guess History")
+if not st.session_state.history:
+    st.caption("No guesses yet. Make your first guess above!")
+else:
+    for entry in reversed(st.session_state.history):
+        st.write(
+            f"#{entry['attempt']} — `{entry['guess']}` → "
+            f"**{entry['outcome']}** {entry['message']}"
+        )
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")

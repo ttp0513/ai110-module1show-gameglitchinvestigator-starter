@@ -11,7 +11,7 @@ Answer each question in 3 to 5 sentences. Be specific and honest about what actu
 Reflection
 1. When completing the first game, clicking "New Game" does not reset the game. 
 2. Input negative values or 0 returns Go Lower when it should be Go Higher as the expected range is between 1 and 100 (Normal Difficulty)
-3. Difficulty logic does not make sense between number of attempts and number range in each level do not follow any specific trend (higher difficulty = larger range)
+3. Difficulty logic does not make sense: number of attempts and number range in each level do not follow any specific trend (higher difficulty = larger range)
 4. Input 99 says Go Higher but 100 says Go Lower
 
 
