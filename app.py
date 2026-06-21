@@ -1,17 +1,26 @@
 import random
 import streamlit as st
 
+# FIXME: Difficulty Logic is off
 def get_range_for_difficulty(difficulty: str):
     if difficulty == "Easy":
         return 1, 20
     if difficulty == "Normal":
-        return 1, 100
-    if difficulty == "Hard":
         return 1, 50
+    if difficulty == "Hard":
+        return 1, 100
     return 1, 100
 
 
-def parse_guess(raw: str):
+# CHANGED: Added is_in_range() helper to enforce the valid guess range.
+def is_in_range(value: int, low: int, high: int):
+    """Return True only if value is within the inclusive [low, high] range."""
+    return low <= value <= high
+
+
+# CHANGED: parse_guess now takes low/high and rejects out-of-range numbers
+# (e.g. -1 or 0) so they no longer reach check_guess and report "Go LOWER".
+def parse_guess(raw: str, low: int, high: int):
     if raw is None:
         return False, None, "Enter a guess."
 
@@ -25,6 +34,9 @@ def parse_guess(raw: str):
             value = int(raw)
     except Exception:
         return False, None, "That is not a number."
+
+    if not is_in_range(value, low, high):
+        return False, None, f"Enter a number between {low} and {high}."
 
     return True, value, None
 
@@ -147,7 +159,8 @@ if st.session_state.status != "playing":
 if submit:
     st.session_state.attempts += 1
 
-    ok, guess_int, err = parse_guess(raw_guess)
+    # CHANGED: pass the difficulty's range so out-of-range guesses are rejected.
+    ok, guess_int, err = parse_guess(raw_guess, low, high)
 
     if not ok:
         st.session_state.history.append(raw_guess)
